@@ -57,6 +57,8 @@ typedef NS_ENUM(NSUInteger, FBSDKAuthenticationSession) {
 @interface FBSDKBridgeAPI () <FBSDKApplicationObserving, FBSDKContainerViewControllerDelegate>
  #endif
 
+@property (strong, nonatomic) FBSDKContainerViewController *container;
+
 @end
 
 @implementation FBSDKBridgeAPI
@@ -377,8 +379,8 @@ typedef NS_ENUM(NSUInteger, FBSDKAuthenticationSession) {
     NSURLQueryItem *sfvcQueryItem = [[NSURLQueryItem alloc] initWithName:@"sfvc" value:@"1"];
     components.queryItems = [components.queryItems arrayByAddingObject:sfvcQueryItem];
     url = components.URL;
-    FBSDKContainerViewController *container = [[FBSDKContainerViewController alloc] init];
-    container.delegate = self;
+    self.container = [[FBSDKContainerViewController alloc] init];
+    self.container.delegate = self;
     if (parent.transitionCoordinator != nil) {
       // Wait until the transition is finished before presenting SafariVC to avoid a blank screen.
       [parent.transitionCoordinator animateAlongsideTransition:NULL completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
@@ -387,16 +389,16 @@ typedef NS_ENUM(NSUInteger, FBSDKAuthenticationSession) {
         // Disable dismissing with edge pan gesture
         self->_safariViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         [self->_safariViewController performSelector:@selector(setDelegate:) withObject:self];
-        [container displayChildController:self->_safariViewController];
-        [parent presentViewController:container animated:YES completion:nil];
+        [self.container displayChildController:self->_safariViewController];
+        [parent presentViewController:self.container animated:YES completion:nil];
       }];
     } else {
       _safariViewController = [[SFSafariViewControllerClass alloc] initWithURL:url];
       // Disable dismissing with edge pan gesture
       _safariViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
       [_safariViewController performSelector:@selector(setDelegate:) withObject:self];
-      [container displayChildController:_safariViewController];
-      [parent presentViewController:container animated:YES completion:nil];
+      [self.container displayChildController:_safariViewController];
+      [parent presentViewController:self.container animated:YES completion:nil];
     }
 
     // Assuming Safari View Controller always opens
